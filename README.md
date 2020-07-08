@@ -39,7 +39,7 @@ version: "3"
 
 services:
   docker-notify:
-    image: dockernotify:latest
+    image: docker_notify:latest
     environment:
       NOTIFY_STATUS: ['created','restarting','running','paused','exited']
       TIMEOUT: 10
