@@ -32,19 +32,21 @@ TELEGRAM_CHAT_ID=
 
 # Docker
 
+```
+docker run  -e "NOTIFY_STATUS=['created','restarting','running','paused','exited']" -e "TIMEOUT=10" silvelo/docker_notify
+```
 ## docker-compose
-If you are in windows mount the volume, if not ignore it.
+
 ```
 version: "3"
 
 services:
   docker-notify:
-    image: docker_notify:latest
+    image: silvelo/docker_notify:latest
     environment:
       NOTIFY_STATUS: ['created','restarting','running','paused','exited']
       TIMEOUT: 10
     restart: on-failure
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
+    
 ```
+
