@@ -10,8 +10,6 @@ WORKDIR /usr/src/app
 
 COPY requirements.txt ./
 
-VOLUME /var/run/docker.sock /var/run/docker.sock
-
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .

@@ -2,33 +2,44 @@ import time
 import requests_unixsocket
 import logging
 import os
-from custom_logging import CustomLogger
+
+import sys
 
 
-class Notify:
-    def __init__(self, notify_status=[], timeout=0):
-        self.logger = CustomLogger().logger
-        self.notify_status = notify_status
-        self.timeout = timeout
+class Notify():
+    def __init__(self, conf):
+        self.conf = conf
+        self.logger = logging.getLogger('docker_notify')
+
         self._sock_url = 'http+unix://%2Fvar%2Frun%2Fdocker.sock/containers/json?all=1'
+        secret_conf = {**conf, **{
+            'TELGRAM_TOKEN': '*',
+            'SLACK_HOOK_URL': '*',
+            'TELEGRAM_CHAT_ID': '*'
+        }}
+        self.logger.debug(
+            'Start docker notify with conf: {}'.format(secret_conf))
 
     def start(self):
-        while True:
-            try:
-                containers = self._create_session()
+        self.logger.debug('Start Docker Notify ')
 
-                for container in containers:
-                    container_name = container['Names'][-1]
-                    container_state = container['State']
-                    if container_state in self.notify_status:
-                        self.logger.info("Name: {}\nState: {}".format(
-                            container_name, container_state))
-                time.sleep(int(self.timeout))
-            except Exception as e:
-                self.logger.error(e, exc_info=True)
+        while True:
+
+            message = ""
+            containers = self._create_session()
+
+            for container in containers:
+                container_name = container['Names'][-1]
+                container_state = container['State']
+                if container_state in self.conf.get('NOTIFY_STATUS'):
+                    message = "{}\nName: {}\nState: {}".format(
+                        message, container_name, container_state)
+
+            self.logger.info(message)
+            self.logger.debug('Sleep until next check')
+            time.sleep(self.conf.get('TIME_OUT'))
 
     def _create_session(self):
-
         session = requests_unixsocket.Session()
         r = session.get(self._sock_url)
         return r.json()

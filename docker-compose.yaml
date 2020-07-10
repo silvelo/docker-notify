@@ -7,3 +7,9 @@ services:
       dockerfile: Dockerfile
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      TELGRAM_TOKEN: ""
+      TELEGRAM_CHAT_ID: ""
+      SLACK_HOOK_URL: ""
+      NOTIFY_STATUS: "created,restarting,running,paused,exited"
+      TIME_OUT: 10
